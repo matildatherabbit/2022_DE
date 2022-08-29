@@ -87,7 +87,7 @@ CREATE TABLE helennearing.weather_forecast (
 );
 """
 
-dag = DAG(
+dag_weather_assignment = DAG(
     dag_id = 'dag_weather_assignment',
     start_date = datetime(2022,8,24), # 날짜가 미래인 경우 실행이 안됨
     schedule_interval = '0 4 * * *',  # 적당히 조절
