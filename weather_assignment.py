@@ -28,8 +28,8 @@ def extract(**context):
     logging.info(execution_date)
     f = requests.get(link)
     f_js = f.json()
+    logging.info(f_js)
     return (f_js)
-
 
 def transform(**context):
     content = context["task_instance"].xcom_pull(key="return_value", task_ids="extract")
