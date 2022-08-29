@@ -33,18 +33,18 @@ def extract(**context):
 
 def transform(**context):
     content = context["task_instance"].xcom_pull(key="return_value", task_ids="extract")
-    weather_info = content.load(f_js)
+    weather_info = content.loads(f_js)
     return weather_info
 
-    loggin.info(weather_info)
+    logging.info(weather_info)
 
 
 def load(**context):
     schema = context["params"]["schema"]
     table = context["params"]["table"]
-    
+
     cur = get_Redshift_connection()
-    lines = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
+    weather_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
     sql = "BEGIN; DELETE FROM {schema}.{table};".format(schema=schema, table=table)
     for line in lines:
         if line != "":
