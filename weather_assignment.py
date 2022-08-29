@@ -36,6 +36,8 @@ def transform(**context):
     weather_info = content.load(f_js)
     return weather_info
 
+    loggin.info(weather_info)
+
 
 def load(**context):
     schema = context["params"]["schema"]
