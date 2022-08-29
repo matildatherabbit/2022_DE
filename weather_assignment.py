@@ -35,7 +35,6 @@ def transform(**context):
     content = context["task_instance"].xcom_pull(key="return_value", task_ids="extract")
     weather_info = content.loads(f_js)
     return weather_info
-
     logging.info(weather_info)
 
 
@@ -45,16 +44,25 @@ def load(**context):
 
     cur = get_Redshift_connection()
     weather_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
-    sql = "BEGIN; DELETE FROM {schema}.{table};".format(schema=schema, table=table)
-    for line in lines:
-        if line != "":
-            (name, gender) = line.split(",")
-            print(name, "-", gender)
-            sql += f"""INSERT INTO {schema}.{table} VALUES ('{name}', '{gender}');"""
+    main_table = '''CREATE TABLE helennearing.weather_forecast (
+                date date primary key,
+                temp float,
+                min_temp float,
+                max_temp float,
+                created_date timestamp default GETDATE())'''
+    for date, temp, min_temp, max_temp in weather_info['daily']:
+        print(date['dt'], temp['day'], min_temp['min'], max_temp['max'])
+        sql += f"""INSERT INTO {schema}.{table} VALUES  ('{date}, '{temp}', '{min}', '{max}');"""
     sql += "END;"
     logging.info(sql)
-    cur.execute(sql)
+    cur.execute(main_table)
+#     temp_table = 
 
+# def reload(**context):
+#     sql = "BEGIN; DELETE FROM {schema}.{table};".format(schema=schema, table=table)
+    
+#     logging.info(sql)
+#     cur.execute(sql)
 
 dag_weather_assignment = DAG(
     dag_id = 'dag_weather_assignment',
